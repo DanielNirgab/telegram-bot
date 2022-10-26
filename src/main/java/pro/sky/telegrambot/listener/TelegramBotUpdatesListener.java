@@ -85,16 +85,14 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 task.setTaskHead("Task " + taskText);
                 createTask(task);
                 telegramBot.execute(new SendMessage(task.getChatId(), "Задача сохранена"));
-                System.out.println("Метод процесс: " + "Chat ID:" + task.getChatId());
-            } catch (DateTimeParseException e) {
-                telegramBot.execute(new SendMessage(update.message().chat().id(), "Не верная дата"));
+            } catch (Exception e) {
+                telegramBot.execute(new SendMessage(update.message().chat().id(), "Неверный формат"));
             }
         }
     }
     // Запись задачи в БД
     public NotificationTask createTask(NotificationTask notificationTask) {
         logger.info("Create Task");
-        System.out.println("Метод сохранения в БД - ChatID" + notificationTask.getChatId());
         return notificationTaskRepository.save(notificationTask);
     }
 
@@ -109,10 +107,9 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
             taskToRemind.forEach(task -> {
                 Long taskChatId = task.getChatId();
                 telegramBot.execute(new SendMessage(taskChatId, task.getTaskText()));
-                System.out.println("Метод напоминания - " + task.getNotificationTime() +" ChatID: " + task.getChatId());
             });
 
-        } catch (NullPointerException e) {
+        } catch (Exception e) {
             logger.info("No updates");
         }
     }
